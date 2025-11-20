@@ -201,14 +201,14 @@ async function handleSendMessage() {
       message: message,
       pageContext: extractPageContext()
     });
-    
+
     // Remove loading
     removeMessageFromChat(loadingId);
-    
+
     // Add response
-    if (response.success) {
+    if (response && response.success) {
       addMessageToChat(response.data.message, 'assistant');
-      
+
       // If courses returned, display them
       if (response.data.courses) {
         displayCourses(response.data.courses);
@@ -217,9 +217,15 @@ async function handleSendMessage() {
       addMessageToChat('Sorry, I encountered an error. Please try again.', 'assistant');
     }
   } catch (error) {
-    console.error('Error sending message:', error);
+    console.error('[Content] Error sending message:', error);
     removeMessageFromChat(loadingId);
-    addMessageToChat('Sorry, I encountered an error. Please try again.', 'assistant');
+
+    // Check if it's the extension reload error
+    if (error.message && error.message.includes('Extension context invalidated')) {
+      addMessageToChat('⚠️ Extension was reloaded. Please refresh this page (F5) to continue.', 'assistant');
+    } else {
+      addMessageToChat('Sorry, I encountered an error. Please try again.', 'assistant');
+    }
   }
 }
 

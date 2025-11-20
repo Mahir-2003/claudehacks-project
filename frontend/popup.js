@@ -91,27 +91,39 @@ async function handleSendMessage() {
   const loadingId = addMessage('Thinking<span class="loading"></span>', 'assistant', true);
   
   try {
+    console.log('[Popup] Calling backend...');
+
     // Call backend API
     const response = await sendToBackend(message);
-    
+
+    console.log('[Popup] Got response:', response);
+
     // Remove loading message
     removeMessage(loadingId);
-    
+
+    // Validate response
+    if (!response || !response.message) {
+      console.error('[Popup] Invalid response format:', response);
+      addMessage('Sorry, got an invalid response from the server.', 'assistant');
+      return;
+    }
+
     // Add assistant response
     addMessage(response.message, 'assistant');
-    
+
     // If response includes course suggestions, display them
     if (response.courses && response.courses.length > 0) {
       displayCourseSuggestions(response.courses);
     }
-    
+
     // Add to conversation history
     conversationHistory.push({ role: 'assistant', content: response.message });
-    
+
   } catch (error) {
-    console.error('Error sending message:', error);
+    console.error('[Popup] Error sending message:', error);
+    console.error('[Popup] Error stack:', error.stack);
     removeMessage(loadingId);
-    addMessage('Sorry, I encountered an error. Please try again.', 'assistant');
+    addMessage(`Sorry, I encountered an error: ${error.message}`, 'assistant');
   }
 }
 
@@ -209,9 +221,14 @@ async function handleCourseSelection(course) {
 // Send message to backend API
 async function sendToBackend(message) {
   try {
-    // Get API endpoint from storage
-    const { apiEndpoint } = await chrome.storage.local.get(['apiEndpoint']);
-    const API_ENDPOINT = apiEndpoint || 'http://localhost:3000';
+    // Get API endpoint from storage (with fallback)
+    let API_ENDPOINT = 'http://localhost:3000'; // Emergency fallback
+    try {
+      const { apiEndpoint } = await chrome.storage.local.get(['apiEndpoint']);
+      if (apiEndpoint) API_ENDPOINT = apiEndpoint;
+    } catch (storageError) {
+      console.warn('[Popup] Storage error, using fallback:', storageError);
+    }
 
     // Get current tab to extract course context
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -239,17 +256,28 @@ async function sendToBackend(message) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('[Popup] Backend error:', errorText);
-      throw new Error(`Backend returned ${response.status}`);
+      console.error('[Popup] Backend HTTP error:', response.status, errorText);
+      throw new Error(`Backend returned ${response.status}: ${errorText.substring(0, 100)}`);
     }
 
     const data = await response.json();
-    console.log('[Popup] Backend response:', data);
+    console.log('[Popup] Backend raw response:', data);
+
+    // Validate backend response structure
+    if (!data || typeof data !== 'object') {
+      console.error('[Popup] Invalid data type:', typeof data);
+      throw new Error('Backend returned invalid data type');
+    }
+
+    if (!data.response) {
+      console.error('[Popup] Missing response field in:', data);
+      throw new Error('Backend response missing required "response" field');
+    }
 
     // Transform backend response to frontend format
-    return {
+    const transformed = {
       message: data.response,
-      madgradesData: data.madgradesData,
+      madgradesData: data.madgradesData || null,
       courses: data.madgradesData ? [{
         code: data.madgradesData.courseCode,
         title: data.madgradesData.courseName,
@@ -258,8 +286,16 @@ async function sendToBackend(message) {
       }] : []
     };
 
+    console.log('[Popup] Transformed response:', transformed);
+    return transformed;
+
   } catch (error) {
-    console.error('Backend error:', error);
+    console.error('[Popup] sendToBackend error:', error);
+    console.error('[Popup] Error details:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
     throw error;
   }
 }

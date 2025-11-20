@@ -71,13 +71,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // Handle chat message
 async function handleChatMessage(message, pageContext) {
   try {
-    const { apiEndpoint } = await chrome.storage.local.get('apiEndpoint');
-    const { selectedCourses } = await chrome.storage.local.get('selectedCourses');
+    // Get API endpoint with emergency fallback
+    let apiEndpoint = 'http://localhost:3000';
+    try {
+      const storage = await chrome.storage.local.get('apiEndpoint');
+      if (storage.apiEndpoint) apiEndpoint = storage.apiEndpoint;
+    } catch (e) {
+      console.warn('[Background] Using fallback endpoint:', apiEndpoint);
+    }
 
     // Extract course context from page
     const courseContext = extractCourseContext(pageContext);
 
-    console.log('[Background] Sending to backend:', { message, courseContext });
+    console.log('[Background] Sending to backend:', { message, courseContext, apiEndpoint });
 
     // Call backend API
     const response = await fetch(`${apiEndpoint}/api/chat`, {

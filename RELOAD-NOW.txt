@@ -1,0 +1,21 @@
+🚨 EMERGENCY FIX APPLIED 🚨
+
+1. GO TO: chrome://extensions/
+
+2. FIND "Badgers Register"
+
+3. CLICK RELOAD 🔄
+
+4. CLICK EXTENSION ICON
+
+5. TYPE "test"
+
+6. SHOULD WORK NOW!
+
+I REPLACED popup.js with popup-simple.js:
+- No Chrome storage
+- Direct API calls
+- Hardcoded to localhost:3000
+- Should work immediately
+
+RELOAD THE EXTENSION NOW!!!
