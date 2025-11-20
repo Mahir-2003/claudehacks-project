@@ -15,7 +15,7 @@ chrome.runtime.onInstalled.addListener((details) => {
         interests: [],
         notificationsEnabled: true
       },
-      apiEndpoint: 'https://your-backend-api.com' // TODO: Update with actual endpoint
+      apiEndpoint: 'http://localhost:3000' // Backend API endpoint
     });
     
     // Open welcome page or instructions (optional)
@@ -73,54 +73,81 @@ async function handleChatMessage(message, pageContext) {
   try {
     const { apiEndpoint } = await chrome.storage.local.get('apiEndpoint');
     const { selectedCourses } = await chrome.storage.local.get('selectedCourses');
-    
-    // TODO: Replace with actual backend endpoint when ready
-    // For now, return mock response
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          message: `I can help you with that! Based on the page you're on, here are some suggestions.`,
-          courses: [
-            {
-              code: 'CS 400',
-              title: 'Programming III',
-              credits: 3,
-              instructor: 'Prof. Smith'
-            },
-            {
-              code: 'MATH 340',
-              title: 'Elementary Matrix and Linear Algebra',
-              credits: 3,
-              instructor: 'Prof. Johnson'
-            }
-          ]
-        });
-      }, 1000);
-    });
-    
-    /* Uncomment when backend is ready:
-    const response = await fetch(`${apiEndpoint}/chat`, {
+
+    // Extract course context from page
+    const courseContext = extractCourseContext(pageContext);
+
+    console.log('[Background] Sending to backend:', { message, courseContext });
+
+    // Call backend API
+    const response = await fetch(`${apiEndpoint}/api/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         message,
-        pageContext,
-        selectedCourses
+        courseContext
       })
     });
-    
+
     if (!response.ok) {
-      throw new Error('Failed to send chat message');
+      const errorText = await response.text();
+      console.error('[Background] Backend error:', errorText);
+      throw new Error(`Backend returned ${response.status}: ${errorText}`);
     }
-    
-    return await response.json();
-    */
+
+    const data = await response.json();
+    console.log('[Background] Backend response:', data);
+
+    // Transform backend response to frontend format
+    return {
+      message: data.response,
+      madgradesData: data.madgradesData,
+      // Optionally include course suggestions if available
+      courses: extractCoursesFromResponse(data)
+    };
+
   } catch (error) {
     console.error('Error handling chat message:', error);
     throw error;
   }
+}
+
+// Extract course context from page context
+function extractCourseContext(pageContext) {
+  // Try to get course info from detected courses on page
+  const firstCourse = pageContext?.courses?.[0];
+
+  if (firstCourse) {
+    return {
+      courseCode: firstCourse.code || 'UNKNOWN',
+      courseName: firstCourse.title || 'Course',
+      url: pageContext.url || window.location?.href || 'https://enroll.wisc.edu'
+    };
+  }
+
+  // Fallback: Create a general context
+  return {
+    courseCode: 'GENERAL',
+    courseName: 'UW-Madison Course Exploration',
+    url: pageContext?.url || 'https://enroll.wisc.edu'
+  };
+}
+
+// Extract course suggestions from backend response if present
+function extractCoursesFromResponse(data) {
+  // Check if madgradesData contains course info
+  if (data.madgradesData && data.madgradesData.courseCode) {
+    return [{
+      code: data.madgradesData.courseCode,
+      title: data.madgradesData.courseName,
+      credits: 3, // Default
+      avgGPA: data.madgradesData.averageGPA
+    }];
+  }
+
+  return [];
 }
 
 // Get statistics

@@ -131,19 +131,28 @@ const madgradesData = await getMadgradesData(courseContext);
 ### 📋 Project Structure
 
 ```
-badgers-register/
-├── manifest.json          # Extension configuration
-├── popup.html            # Main popup interface
-├── popup.css             # Popup styling
-├── popup.js              # Popup functionality
-├── content.js            # Script injected into wisc.edu pages
-├── content.css           # Styling for injected elements
-├── background.js         # Service worker for background tasks
-└── icons/                # Extension icons (needs to be created)
-    ├── icon16.png
-    ├── icon32.png
-    ├── icon48.png
-    └── icon128.png
+claudehacks-project/
+├── frontend/                 # Chrome Extension
+│   ├── manifest.json        # Extension config
+│   ├── background.js        # Service worker (API calls)
+│   ├── content.js           # Injected into wisc.edu pages
+│   ├── content.css          # Page injection styles
+│   ├── popup.html           # Extension popup UI
+│   ├── popup.js             # Popup logic
+│   ├── popup.css            # Popup styles
+│   ├── icons/               # Extension icons (add your own)
+│   └── README.md            # Frontend documentation
+│
+├── backend/                  # API Server
+│   ├── server.js            # Express + Claude integration
+│   ├── madgrades.js         # Mock grade data module
+│   ├── test-api.js          # API test script
+│   ├── package.json         # Dependencies
+│   ├── .env                 # Your API keys (not in git)
+│   ├── .env.example         # Template
+│   └── .gitignore           # Git ignore rules
+│
+└── README.md                 # This file
 ```
 
 ### 🚀 Installation (Development Mode)
@@ -194,24 +203,31 @@ The backend should expect POST requests with this format:
 **Request:**
 ```json
 {
-  "message": "What courses would you recommend?",
-  "conversationHistory": [...],
-  "selectedCourses": [...]
+  "message": "How hard is this class?",
+  "courseContext": {
+    "courseCode": "CS 400",
+    "courseName": "Programming III",
+    "url": "https://enroll.wisc.edu/..."
+  }
 }
 ```
 
 **Response:**
 ```json
 {
-  "message": "Here are some recommendations...",
-  "courses": [
-    {
-      "code": "CS 400",
-      "title": "Programming III",
-      "credits": 3,
-      "instructor": "Prof. Smith"
-    }
-  ]
+  "response": "Based on the grade data, CS 400 has an average GPA of 3.15...",
+  "madgradesData": {
+    "courseCode": "CS 400",
+    "courseName": "Programming III",
+    "averageGPA": 3.15,
+    "gradeDistribution": {
+      "A": 28, "AB": 22, "B": 25, "BC": 15, "C": 8, "D": 1, "F": 1
+    },
+    "instructors": [
+      { "name": "Mock Professor", "sections": 3, "avgGPA": 3.2 }
+    ],
+    "note": "This is mock data - real Madgrades integration in progress"
+  }
 }
 ```
 

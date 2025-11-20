@@ -208,57 +208,60 @@ async function handleCourseSelection(course) {
 
 // Send message to backend API
 async function sendToBackend(message) {
-  // TODO: Replace with your actual backend API endpoint
-  const API_ENDPOINT = 'https://your-backend-api.com/chat';
-  
-  // For now, return a mock response
-  // Remove this and uncomment the fetch code below when backend is ready
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        message: 'I can help you with that! Here are some course recommendations based on your interests.',
-        courses: [
-          {
-            code: 'CS 400',
-            title: 'Programming III',
-            credits: 3,
-            instructor: 'Prof. Smith'
-          },
-          {
-            code: 'MATH 340',
-            title: 'Elementary Matrix and Linear Algebra',
-            credits: 3,
-            instructor: 'Prof. Johnson'
-          }
-        ]
-      });
-    }, 1000);
-  });
-  
-  /* Uncomment this when your backend is ready:
   try {
-    const response = await fetch(API_ENDPOINT, {
+    // Get API endpoint from storage
+    const { apiEndpoint } = await chrome.storage.local.get(['apiEndpoint']);
+    const API_ENDPOINT = apiEndpoint || 'http://localhost:3000';
+
+    // Get current tab to extract course context
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+    // Create course context
+    const courseContext = {
+      courseCode: 'GENERAL',
+      courseName: 'UW-Madison Course Exploration',
+      url: tab?.url || 'https://enroll.wisc.edu'
+    };
+
+    console.log('[Popup] Sending to backend:', { message, courseContext });
+
+    // Call backend API
+    const response = await fetch(`${API_ENDPOINT}/api/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         message: message,
-        conversationHistory: conversationHistory,
-        selectedCourses: selectedCourses
+        courseContext: courseContext
       })
     });
-    
+
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      const errorText = await response.text();
+      console.error('[Popup] Backend error:', errorText);
+      throw new Error(`Backend returned ${response.status}`);
     }
-    
-    return await response.json();
+
+    const data = await response.json();
+    console.log('[Popup] Backend response:', data);
+
+    // Transform backend response to frontend format
+    return {
+      message: data.response,
+      madgradesData: data.madgradesData,
+      courses: data.madgradesData ? [{
+        code: data.madgradesData.courseCode,
+        title: data.madgradesData.courseName,
+        credits: 3,
+        avgGPA: data.madgradesData.averageGPA
+      }] : []
+    };
+
   } catch (error) {
     console.error('Backend error:', error);
     throw error;
   }
-  */
 }
 
 // Listen for messages from content script
