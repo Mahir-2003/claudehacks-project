@@ -1,0 +1,415 @@
+/* Styles for elements injected into the page */
+
+/* Floating Button */
+.badgers-floating-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: linear-gradient(135deg, #c5050c 0%, #9b0000 100%);
+  color: white;
+  border: none;
+  padding: 16px 24px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(197, 5, 12, 0.4);
+  z-index: 999999;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.badgers-floating-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(197, 5, 12, 0.5);
+  background: linear-gradient(135deg, #d60611 0%, #c5050c 100%);
+}
+
+.badgers-floating-btn:active {
+  transform: translateY(-1px);
+}
+
+@keyframes badgers-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Sidebar */
+.badgers-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 420px;
+  height: 100vh;
+  background: white;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+  z-index: 1000000;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.badgers-sidebar.open {
+  transform: translateX(0);
+}
+
+/* Sidebar Header */
+.badgers-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #c5050c 0%, #9b0000 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.badgers-sidebar-title {
+  display: flex;
+  align-items: center;
+}
+
+.badgers-sidebar-title h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.badgers-close-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.badgers-close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Stats Section */
+.badgers-sidebar-stats {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.badgers-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.badgers-stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #c5050c;
+}
+
+.badgers-stat-label {
+  font-size: 12px;
+  color: #646569;
+  margin-top: 4px;
+}
+
+/* Chat Area */
+.badgers-sidebar-chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background: white;
+}
+
+.badgers-sidebar-chat::-webkit-scrollbar {
+  width: 6px;
+}
+
+.badgers-sidebar-chat::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+.badgers-sidebar-chat::-webkit-scrollbar-thumb {
+  background: #646569;
+  border-radius: 3px;
+}
+
+/* Welcome Message */
+.badgers-welcome {
+  background: linear-gradient(135deg, #f8f9fa 0%, #f5f5f5 100%);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+.badgers-welcome h3 {
+  font-size: 18px;
+  margin: 0 0 12px 0;
+  color: #282829;
+}
+
+.badgers-welcome p {
+  font-size: 14px;
+  color: #646569;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+}
+
+.badgers-welcome ul {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+}
+
+.badgers-welcome li {
+  font-size: 14px;
+  color: #646569;
+  padding: 6px 0;
+  padding-left: 24px;
+  position: relative;
+}
+
+.badgers-welcome li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #4caf50;
+  font-weight: bold;
+}
+
+/* Chat Messages */
+.badgers-message {
+  margin-bottom: 16px;
+  animation: badgers-fadeIn 0.3s ease;
+}
+
+@keyframes badgers-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.badgers-message-user {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.badgers-message-user .badgers-message-content {
+  background: #c5050c;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 16px 16px 4px 16px;
+  max-width: 80%;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.badgers-message-assistant {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.badgers-message-assistant .badgers-message-content {
+  background: #f5f5f5;
+  color: #282829;
+  padding: 12px 16px;
+  border-radius: 16px 16px 16px 4px;
+  max-width: 80%;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Loading Animation */
+.badgers-loading:after {
+  content: '...';
+  animation: badgers-dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes badgers-dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
+}
+
+/* Course Cards */
+.badgers-course-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 12px;
+  transition: all 0.2s ease;
+}
+
+.badgers-course-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #c5050c;
+}
+
+.badgers-course-code {
+  font-size: 13px;
+  font-weight: 600;
+  color: #c5050c;
+  margin-bottom: 4px;
+}
+
+.badgers-course-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #282829;
+  margin-bottom: 4px;
+}
+
+.badgers-course-details {
+  font-size: 13px;
+  color: #646569;
+  margin-bottom: 12px;
+}
+
+.badgers-course-add {
+  width: 100%;
+  padding: 8px 16px;
+  background: #c5050c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.badgers-course-add:hover {
+  background: #9b0000;
+}
+
+/* Quick Actions */
+.badgers-quick-actions {
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px;
+  background: white;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.badgers-action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  color: #282829;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.badgers-action-btn:hover {
+  background: #c5050c;
+  color: white;
+  border-color: #c5050c;
+}
+
+/* Input Area */
+.badgers-sidebar-input {
+  display: flex;
+  gap: 8px;
+  padding: 20px;
+  background: white;
+  border-top: 2px solid #f5f5f5;
+}
+
+#badgers-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 24px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+#badgers-input:focus {
+  border-color: #c5050c;
+}
+
+.badgers-send-btn {
+  background: #c5050c;
+  border: none;
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.badgers-send-btn:hover {
+  background: #9b0000;
+  transform: scale(1.05);
+}
+
+/* Course highlighting on page */
+.badgers-highlighted-course {
+  outline: 3px solid #c5050c !important;
+  outline-offset: 2px;
+  background-color: rgba(197, 5, 12, 0.05) !important;
+  animation: badgers-pulse 2s ease-in-out;
+  scroll-margin-top: 100px;
+}
+
+@keyframes badgers-pulse {
+  0%, 100% {
+    outline-color: #c5050c;
+  }
+  50% {
+    outline-color: #ff6b6b;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .badgers-sidebar {
+    width: 100%;
+  }
+  
+  .badgers-floating-btn {
+    bottom: 20px;
+    right: 20px;
+    padding: 14px 20px;
+    font-size: 14px;
+  }
+}
